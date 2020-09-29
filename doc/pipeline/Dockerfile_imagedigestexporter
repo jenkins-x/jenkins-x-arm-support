@@ -1,0 +1,5 @@
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/imagedigestexporter
+ENTRYPOINT ["/ko-app/imagedigestexporter"]

@@ -1,0 +1,7 @@
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/git-init
+ENV KO_DATA_PATH /var/run/ko
+ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/ko-app
+ENTRYPOINT ["/ko-app/git-init"]
