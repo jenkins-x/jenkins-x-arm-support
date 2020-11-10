@@ -1,0 +1,9 @@
+FROM ubuntu:18.04
+RUN mkdir /kaniko
+COPY executor /kaniko/executor
+ENV HOME /root
+ENV USER /root
+ENV PATH /usr/local/bin:/kaniko
+ENV DOCKER_CONFIG /kaniko/.docker/
+WORKDIR /workspace
+ENTRYPOINT ["/kaniko/executor"]

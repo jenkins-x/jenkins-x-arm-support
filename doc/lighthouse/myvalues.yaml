@@ -1,0 +1,225 @@
+git:
+  kind: github
+  name: github
+  server: ""
+
+lighthouseJobNamespace: ""
+
+githubApp:
+  enabled: false
+  username:  "jenkins-x[bot]"
+
+# hmacToken -- Secret used for webhooks
+hmacToken: ""
+
+image:
+  # image.parentRepository -- Docker registry to pull images from
+  parentRepository:
+
+  # image.tag -- Docker images tag
+  tag: 0.0.738
+
+  # image.pullPolicy -- Image pull policy
+  pullPolicy: IfNotPresent
+
+# env -- Environment variables
+env:
+  JX_DEFAULT_IMAGE: ""
+
+gcJobs:
+  maxAge: 168h
+  image:
+    repository: "{{ .Values.image.parentRepository }}lighthouse-gc-jobs"
+    tag: "{{ .Values.image.tag }}"
+    pullPolicy: "{{ .Values.image.pullPolicy }}"
+  schedule: "0/30 * * * *"
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+
+webhooks:
+  # webhooks.replicaCount -- Number of replicas
+  replicaCount: 2
+
+  # webhooks.terminationGracePeriodSeconds -- Termination grace period for webhooks pods
+  terminationGracePeriodSeconds: 180
+
+  image:
+    repository: "{{ .Values.image.parentRepository }}lighthouse-webhooks"
+    tag: "{{ .Values.image.tag }}"
+    pullPolicy: "{{ .Values.image.pullPolicy }}"
+  service:
+    name: hook
+    type: ClusterIP
+    externalPort: 80
+    internalPort: 8080
+
+  resources:
+    # webhooks.resources.limits -- Resource limits applied to the webhooks pods
+    limits:
+      cpu: 100m
+      memory: 256Mi
+
+    # webhooks.resources.requests -- Resource requests applied to the webhooks pods
+    requests:
+      cpu: 80m
+      memory: 128Mi
+
+  probe:
+    path: /
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  readinessProbe:
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+
+foghorn:
+  # foghorn.replicaCount -- Number of replicas
+  replicaCount: 1
+  
+  # foghorn.terminationGracePeriodSeconds -- Termination grace period for foghorn pods
+  terminationGracePeriodSeconds: 180
+
+  image:
+    repository: "{{ .Values.image.parentRepository }}lighthouse-foghorn"
+    tag: "{{ .Values.image.tag }}"
+    pullPolicy: "{{ .Values.image.pullPolicy }}"
+
+  resources:
+    # foghorn.resources.limits -- Resource limits applied to the foghorn pods
+    limits:
+      cpu: 100m
+      memory: 256Mi
+
+    # foghorn.resources.requests -- Resource requests applied to the foghorn pods
+    requests:
+      cpu: 80m
+      memory: 128Mi
+
+  reportURLBase: ""
+
+tektoncontroller:
+  # tektoncontroller.dashboardURL -- Tekton dashboard URL
+  dashboardURL: ''
+
+  # tektoncontroller.replicaCount -- Number of replicas
+  replicaCount: 1
+
+  # tektoncontroller.terminationGracePeriodSeconds -- Termination grace period for tekton controller pods
+  terminationGracePeriodSeconds: 180
+
+  image:
+    # tektoncontroller.image.repository -- Template for computing the tekton controller docker image repository
+    repository: "{{ .Values.image.parentRepository }}lighthouse-tekton-controller"
+
+    # tektoncontroller.image.tag -- Template for computing the tekton controller docker image tag
+    tag: "{{ .Values.image.tag }}"
+
+    # tektoncontroller.image.repository -- Template for computing the tekton controller docker image pull policy
+    pullPolicy: "{{ .Values.image.pullPolicy }}"
+
+  resources:
+    # tektoncontroller.resources.limits -- Resource limits applied to the tekton controller pods
+    limits:
+      cpu: 100m
+      memory: 256Mi
+
+    # tektoncontroller.resources.requests -- Resource requests applied to the tekton controller pods
+    requests:
+      cpu: 80m
+      memory: 128Mi
+
+  service:
+    # tektoncontroller.resoserviceurces.annotations -- Annotations to be applied of tekton controller service
+    annotations: {}
+
+keeper:
+  statusContextLabel: "Lighthouse Merge Status"
+
+  # keeper.replicaCount -- Number of replicas
+  replicaCount: 1
+
+  # keeper.terminationGracePeriodSeconds -- Termination grace period for keeper pods
+  terminationGracePeriodSeconds: 30
+
+  livenessProbe:
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  readinessProbe:
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  probe:
+    path: /
+  image:
+    repository: "{{ .Values.image.parentRepository }}lighthouse-keeper"
+    tag: "{{ .Values.image.tag }}"
+  imagePullPolicy: IfNotPresent
+
+  resources:
+    # keeper.resources.limits -- Resource limits applied to the keeper pods
+    limits:
+      cpu: 400m
+      memory: 512Mi
+
+    # keeper.resources.requests -- Resource requests applied to the keeper pods
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  service:
+    type: ClusterIP
+    externalPort: 80
+    internalPort: 8888
+  datadog:
+    enabled: "true"
+
+vault:
+  enabled: false
+
+clusterName: ""
+
+user: ""
+
+logFormat: "json"
+
+cluster:
+  crds:
+    # cluster.crds.create -- Create custom resource definitions
+    create: true
+
+engines:
+  # engines.jx -- Enables the jx engine
+  jx: true
+
+  # engines.tekton -- Enables the tekton engine
+  tekton: false
+
+createIngress: false
+
+domainName: ""
+
+hook:
+  ingress:
+    class: nginx
+    annotations:
+    tls:
+      secretName: ""
+
+configMaps:
+  create: false
+  config: null
+  plugins: null
+  configUpdater:
+    orgAndRepo: ""
+    path: ""
+  # Example of specifying config-updater repository, which should contain "config.yaml" and "plugins.yaml" in the given path.
+  # configUpdater:
+  #   orgAndRepo: foo/bar
+  #   path: a/b/c

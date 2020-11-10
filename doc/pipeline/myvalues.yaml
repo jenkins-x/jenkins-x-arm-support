@@ -1,0 +1,46 @@
+image:
+  upstreamtag: 0.15.2-arm64
+  kubeconfigwriter: kubeconfigwriter
+  credsinit: creds-init
+  gitinit: git-init
+  controller: controller
+  webhook: webhook
+  entrypoint: entrypoint
+  pullrequest: pullrequest-init
+  imagedigestexporter: imagedigestexporter
+  gcsfetcher: gcs-fetcher
+auth:
+  git:
+    username:
+    password:
+    url:
+  docker:
+    username:
+    password:
+    url:
+    # url: https://gcr.io
+    host:
+    email:
+
+controller:
+  enabled: true
+
+serviceaccount:
+  enabled: true
+  annotations: {}
+
+webhook:
+  enabled: true
+
+rbac:
+  cluster: true
+
+cluster:
+  resources:
+    create: true
+  crds:
+    create: true
+
+pvc:
+  size: 5Gi
+  storageClassName:

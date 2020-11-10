@@ -1,0 +1,6 @@
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client ca-certificates git  -y
+COPY gc-jobs /gc-jobs
+RUN mkdir /jxhome
+ENV JX_HOME /jxhome
+ENTRYPOINT ["/gc-jobs"]

@@ -1,0 +1,4 @@
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client ca-certificates git  -y
+COPY lighthouse-tekton-controller /lighthouse-tekton-controller
+ENTRYPOINT ["/lighthouse-tekton-controller"]
