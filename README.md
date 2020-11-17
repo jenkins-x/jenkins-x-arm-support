@@ -17,6 +17,19 @@ The goals of this project are:
 	b. Another cluster using Tekton to demonstrate serverless CI/CD pipelines.
  4. To demonstrate a working CI/CD pipeline for Jenkins X on an ARM server based cloud.
 
+## Current Multi Architecture Images
+
+We have migrated the following components in Jenkins X to use multi-architecture images in releases and so are ready to be tested on ARM servers. The images may need to be mirrored to another container registry from gcr.io:
+
+* [jenkins-x/jx-git-operator](https://github.com/jenkins-x/jx-git-operator) using this [Dockerfile](https://github.com/jenkins-x/jx-git-operator/blob/master/Dockerfile) creates this image: [gcr.io/jenkinsxio/jx-git-operator](https://console.cloud.google.com/gcr/images/jenkinsxio/GLOBAL/jx-git-operator)
+
+* [jenkins-x/jx-cli](https://github.com/jenkins-x/jx-cli) using this [Dockerfile](https://github.com/jenkins-x/jx-cli/blob/master/Dockerfile-boot) creates this image: [gcr.io/jenkinsxio/jx-boot](https://console.cloud.google.com/gcr/images/jenkinsxio/GLOBAL/jx-boot)
+
+Those images should be enough to start booting a [Jenkins X V3 cluster](https://jenkins-x.io/docs/v3/) following the [kubernetes instructions](https://jenkins-x.io/docs/v3/getting-started/on-premise/)
+
+Note that pipelines are still being converted to multi-architecture images so those won't yet work; but hopefully soon...
+
+
 ## Minimum Set of Components
 (To be clarified) The following components are identified as a minimum set to let Jenkins X to run on Arm server:
 
