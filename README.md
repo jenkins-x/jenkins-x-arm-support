@@ -39,6 +39,7 @@ The following need migration
 
 * kaniko-debug needs a multi-architecture build. There's a [multi-arch one](https://console.cloud.google.com/gcr/images/kaniko-project/GLOBAL/executor) but no shell included yet so we can't use it yet
 * jx-build-controller
+* bucketrepo
 
 ## Minimum Set of Components
 (To be clarified) The following components are identified as a minimum set to let Jenkins X to run on Arm server:
