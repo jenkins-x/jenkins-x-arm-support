@@ -25,10 +25,20 @@ We have migrated the following components in Jenkins X to use multi-architecture
 
 * [jenkins-x/jx-cli](https://github.com/jenkins-x/jx-cli) using this [Dockerfile](https://github.com/jenkins-x/jx-cli/blob/master/Dockerfile-boot) creates this image: [gcr.io/jenkinsxio/jx-boot](https://console.cloud.google.com/gcr/images/jenkinsxio/GLOBAL/jx-boot)
 
+* [jenkins-x/jx-preview](https://github.com/jenkins-x/jx-clpreviewi) using this [Dockerfile](https://github.com/jenkins-x/jx-preview/blob/master/Dockerfile) creates this image: [gcr.io/jenkinsxio/jx-preview](https://console.cloud.google.com/gcr/images/jenkinsxio/GLOBAL/jx-preview)
+
+* [jenkins-x/jx-promote](https://github.com/jenkins-x/jx-clpreviewi) using this [Dockerfile](https://github.com/jenkins-x/jx-promote/blob/master/Dockerfile) creates this image: [gcr.io/jenkinsxio/jx-promote](https://console.cloud.google.com/gcr/images/jenkinsxio/GLOBAL/jx-promote)
+
 Those images should be enough to start booting a [Jenkins X V3 cluster](https://jenkins-x.io/docs/v3/) following the [kubernetes instructions](https://jenkins-x.io/docs/v3/getting-started/on-premise/)
 
 Note that pipelines are still being converted to multi-architecture images so those won't yet work; but hopefully soon...
 
+### Pending issues:
+
+The following need migration
+
+* kaniko-debug needs a multi-architecture build. There's a [multi-arch one](https://console.cloud.google.com/gcr/images/kaniko-project/GLOBAL/executor) but no shell included yet so we can't use it yet
+* jx-build-controller
 
 ## Minimum Set of Components
 (To be clarified) The following components are identified as a minimum set to let Jenkins X to run on Arm server:
