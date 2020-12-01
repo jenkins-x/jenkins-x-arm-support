@@ -1,0 +1,42 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-docker-image-from-git-source
+spec:
+  resources:
+    inputs:
+      - name: task-input-1
+        type: git
+    outputs:
+      - name: task-out-1
+        type: image
+  steps:
+    - name: pwd
+      image: ubuntu:18.04
+      script: |
+        #!/usr/bin/env bash
+        pwd
+        ls -al
+    - name: go-build 
+      image: golang:1.15
+      env:
+        - name: "PATH"
+          value: "/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        - name: "GOPATH"
+          value: "/go"
+      script: |
+        #!/usr/bin/env bash
+        pwd
+        go build /workspace/task-input-1/main.go
+        ls /workspace/task-input-1/
+        ls /workspace
+    - name: build-image-and-push 
+      image: kaniko-executable:arm64
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(resources.inputs.task-input-1.path)/Dockerfile
+        - --insecure-registry=213.146.155.118:5000
+        - --registry-mirror=213.146.155.118:5000
+        - --destination=213.146.155.118:5000/testhel2016:v1
+        - --skip-tls-verify-registry=213.146.155.118:5000

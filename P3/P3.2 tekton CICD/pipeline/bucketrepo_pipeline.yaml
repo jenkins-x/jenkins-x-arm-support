@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-bucketrepo-loop
+spec:
+  resources:
+    - name: bucketrepo-pipeline-input
+      type: git
+  tasks:
+    - name: step1
+      taskRef:
+        name: task-bucketrepo-loop
+      params:
+        - name: dockerRegistry
+          value: 213.146.155.118:5500
+        - name: containerImageTag
+          value: test-loop
+      resources:
+        inputs:
+          - name: task-input-bucketrepo
+            resource: bucketrepo-pipeline-input

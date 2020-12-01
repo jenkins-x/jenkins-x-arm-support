@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: test-hello-pipelinerun-1
+spec:
+  serviceAccountName: tutorial-service
+  pipelineRef:
+    name: test-hello-pipeline
+  resources:
+    - name: pipeline-input-1
+      resourceRef:
+        name: git-clone-hello-in-1
+    - name: pipeline-out-1
+      resourceRef:
+        name: build-and-push-image-out-1
+
