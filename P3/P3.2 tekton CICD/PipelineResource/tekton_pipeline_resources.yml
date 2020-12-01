@@ -1,0 +1,11 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: git-clone-tekton
+spec:
+  type: git
+  params:
+    - name: revision
+      value: modify-release-v0.15.x
+    - name: url
+      value: https://github.com/yyunk/pipeline.git

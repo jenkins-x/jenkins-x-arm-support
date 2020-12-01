@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-lighthouse-CD
+spec:
+  resources:
+    inputs:
+      - name: task-input-lighthouse
+        type: git
+  steps:
+    - name: deploy-lighthouse
+      image: kubectl-helm:v1
+      volumeMounts:
+        - name: kube-config
+          mountPath: /root/.kube
+      script: |
+        #!/usr/bin/env bash
+        cd $(resources.inputs.task-input-lighthouse-1.path)/charts/
+        helm upgrade lighthouse5 lighthouse --install --namespace test5 --values myvalues.yaml
+  volumes:
+    - name: kube-config
+      hostPath:
+        path: /home/ubuntu/.kube

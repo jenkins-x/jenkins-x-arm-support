@@ -1,0 +1,102 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: git-clone-hello-in-1
+spec:
+  type: git
+  params:
+    - name: revision
+      value: master
+    - name: url
+      value: https://github.com/yyk757/test-hello
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: build-and-push-image-out-1
+spec:
+  type: image
+  params:
+    - name: url
+      value: 213.146.155.118:5000/test-hello:v1
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-docker-image-from-git-source
+spec:
+  resources:
+    inputs:
+      - name: task-input-1
+        type: git
+    outputs:
+      - name: task-out-1
+        type: image
+  steps:
+    - name: pwd
+      image: ubuntu:18.04
+      script: |
+        #!/usr/bin/env bash
+        pwd
+        ls -al
+    - name: go-build 
+      image: golang:1.15
+      env:
+        - name: "PATH"
+          value: "/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        - name: "GOPATH"
+          value: "/go"
+      script: |
+        #!/usr/bin/env bash
+        pwd
+        go build /workspace/task-input-1/main.go
+        ls /workspace/task-input-1/
+        ls /workspace
+    - name: build-image-and-push 
+      image: kaniko-executable:arm64
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(resources.inputs.task-input-1.path)/Dockerfile
+        - --insecure-registry=213.146.155.118:5000
+        - --registry-mirror=213.146.155.118:5000
+        - --destination=213.146.155.118:5000/testhel2016:v1
+        - --skip-tls-verify-registry=213.146.155.118:5000
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: test-hello-pipeline
+spec:
+  resources:
+    - name: pipeline-input-1
+      type: git
+    - name: pipeline-out-1
+      type: image
+  tasks:
+    - name: step1
+      taskRef:
+        name: build-docker-image-from-git-source
+      resources:
+        inputs:
+          - name: task-input-1
+            resource: pipeline-input-1
+        outputs:
+          - name: task-out-1
+            resource: pipeline-out-1
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: test-hello-pipelinerun-1
+spec:
+  serviceAccountName: tutorial-service
+  pipelineRef:
+    name: test-hello-pipeline
+  resources:
+    - name: pipeline-input-1
+      resourceRef:
+        name: git-clone-hello-in-1
+    - name: pipeline-out-1
+      resourceRef:
+        name: build-and-push-image-out-1

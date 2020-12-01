@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-bucketrepo-CD
+spec:
+  resources:
+    inputs:
+      - name: task-input-bucketrepo
+        type: git
+  steps:
+    - name: deploy-bucketrepo
+      image: kubectl-helm:v1
+      volumeMounts:
+        - name: kube-config
+          mountPath: /root/.kube
+      script: |
+        #!/usr/bin/env bash
+        cd $(resources.inputs.task-input-bucketrepo.path)/charts
+        helm upgrade bucketrepo5 bucketrepo --install --namespace test5 --values myvalues.yaml
+  volumes:
+    - name: kube-config
+      hostPath:
+        path: /home/ubuntu/.kube

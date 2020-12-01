@@ -1,0 +1,45 @@
+pod_namespace: lighthouse2
+prowjob_namespace: lighthouse2
+postsubmits:
+  yyk757/test-hello:
+    - agent: tekton-pipeline
+      branches:
+        - master
+      context: test-hello
+      name: test-hello
+      pipeline_run_spec:
+        serviceAccountName: tutorial-service
+        pipelineRef:
+          name: test-hello-pipeline
+        resources:
+          - name: pipeline-input-1
+            resourceRef:
+              name: git-clone-hello-in-1
+          - name: pipeline-out-1
+            resourceRef:
+              name: build-and-push-image-out-1
+  yyunk/lighthouse:
+    - agent: tekton-pipeline
+      branches:
+        - master
+      context: lighthouse
+      name: lighthouse
+      pipeline_run_spec:
+        serviceAccountName: tutorial-service
+        pipelineRef:
+          name: pipeline-lighthouse
+        resources:
+          - name: lighthouse-pipeline-input-1
+            resourceRef:
+              name: git-clone-lighthouse
+          - name: lighthouse-pipeline-out-1
+            resourceRef:
+              name: lighthouse-image-out
+tide:
+  queries:
+  - labels:
+    - approved
+    repos:
+    - yyk757/lighthouse-config
+    - yyk757/test-hello
+    - yyunk/lighthouse

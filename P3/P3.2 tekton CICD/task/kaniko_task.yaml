@@ -1,0 +1,73 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-kaniko-loop
+spec:
+  params:
+    - name: dockerRegistry
+      type: string
+      description: the url of dockerRegistry
+    - name: containerImageTag
+      type: string
+      description: the tag of container image
+  resources:
+    inputs:
+      - name: task-input-kaniko
+        type: git
+  steps:
+    - name: go-build
+      image: golang:1.15
+      env:
+        - name: "PATH"
+          value: "/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        - name: "GOPATH"
+          value: "/go"
+      script: |
+        #!/bin/bash
+        cd $(resources.inputs.task-input-kaniko.path)
+        make out/executor
+        storage_folder="/binary_dockerfile"
+        mkdir $(resources.inputs.task-input-kaniko.path)$storage_folder
+        storage_path=$(resources.inputs.task-input-kaniko.path)$storage_folder
+        echo $storage_path
+        binary_path_in_dockerfile=`grep binary_path_in_dockerfile arm_config|awk -F ":" '{print $2}'`
+        mkdir $storage_path$binary_path_in_dockerfile
+        image_tag=`grep image_tag arm_config|awk -F ":" '{print $2}'`
+        for i in `grep build_image_info arm_config`;
+        do
+        binary_path=`echo  $i|awk -F ":" '{print $2}'|awk -F ";" '{print $1}'`;
+        dockerfile_path=`echo  $i|awk -F ":" '{print $2}'|awk -F ";" '{print $2}'`;
+        image_name=`echo  $i|awk -F ":" '{print $2}'|awk -F ";" '{print $3}'`;
+        cp $(resources.inputs.task-input-kaniko.path)$binary_path $storage_path/$binary_path_in_dockerfile
+        cp $(resources.inputs.task-input-kaniko.path)$dockerfile_path $storage_path/Dockerfile.$image_name
+        done
+
+    - name: build-and-push-images
+      image: kaniko:bash
+      volumeMounts:
+        - name: kaniko-docker-secret
+          mountPath: /kaniko/.docker/
+      script: |
+        #!/bin/bash
+        storage_folder="/binary_dockerfile"
+        storage_path=$(resources.inputs.task-input-kaniko.path)$storage_folder
+        for i in `ls $storage_path |grep Dockerfile`
+        do
+        imagename=`echo $i|awk -F "." '{print $2}'`
+        /kaniko/executor --dockerfile=$storage_path/$i \
+         --insecure-registry=$(params.dockerRegistry) \
+         --registry-mirror=$(params.dockerRegistry) \
+         --skip-tls-verify-registry=$(params.dockerRegistry) \
+         --context=dir:///$storage_path \
+         --destination=$(params.dockerRegistry)/${imagename,,}:$(params.containerImageTag) \
+         --skip-tls-verify \
+         --skip-tls-verify-pull
+        done
+
+  volumes:
+    - name: kaniko-docker-secret
+      hostPath:
+        path: /home/ubuntu/docker-config/
+    - name: kube-config
+      hostPath:
+        path: /home/ubuntu/.kube

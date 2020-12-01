@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: pipelinerun-bucketrepo-loop
+spec:
+  serviceAccountName: tutorial-service
+  pipelineRef:
+    name: pipeline-bucketrepo-loop
+  resources:
+    - name: bucketrepo-pipeline-input
+      resourceRef:
+        name: git-clone-tekton

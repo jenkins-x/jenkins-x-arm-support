@@ -1,0 +1,11 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: git-clone-bucketrepo
+spec:
+  type: git
+  params:
+    - name: revision
+      value: modify-0.1.12
+    - name: url
+      value: https://github.com/yyunk/bucketrepo.git

@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: pipelinerun-kaniko-loop
+spec:
+  serviceAccountName: tutorial-service
+  pipelineRef:
+    name: pipeline-kaniko-loop
+  resources:
+    - name: kaniko-pipeline-input
+      resourceRef:
+        name: git-clone-kaniko

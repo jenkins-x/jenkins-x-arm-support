@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github
+  annotations:
+    tekton.dev/git-0: https://github.com
+type: kubernetes.io/basic-auth
+stringData:
+  username: yyk757
+  password: 100200300wO
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: localregistry
+  annotations:
+    tekton.dev/docker-0: 213.146.155.118:5000
+type: kubernetes.io/basic-auth
+stringData:
+  username: a
+  password: a
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tutorial-service
+secrets:
+  - name: github
+  - name: localregistry
