@@ -1,3 +1,5 @@
+This project is discontinued in this form
+
 # jenkins-x-arm-support
 A project to track progress on supporting ARM64 platforms with Jenkins X.
 
